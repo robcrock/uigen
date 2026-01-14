@@ -16,10 +16,11 @@ npm run dev:daemon       # Start in background (logs to logs.txt)
 npm run build
 npm run start
 
-# Testing
-npm run test             # Run vitest
+# Testing (vitest with jsdom environment)
+npm run test             # Run vitest in watch mode
 npx vitest run           # Run tests once
 npx vitest run path/to/test.test.ts  # Run single test file
+npx vitest run -t "test name"        # Run tests matching name pattern
 
 # Linting
 npm run lint
