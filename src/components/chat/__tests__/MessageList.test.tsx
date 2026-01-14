@@ -8,6 +8,21 @@ vi.mock("../MarkdownRenderer", () => ({
   MarkdownRenderer: ({ content }: { content: string }) => <div>{content}</div>,
 }));
 
+// Mock the ToolCallDisplay component
+vi.mock("../ToolCallDisplay", () => ({
+  ToolCallDisplay: ({ toolInvocation }: { toolInvocation: { toolName: string; args: { command?: string; path?: string } } }) => {
+    const { toolName, args } = toolInvocation;
+    // Simplified version that shows user-friendly message
+    if (toolName === "str_replace_editor" && args.path) {
+      const command = args.command;
+      if (command === "create") return <div>Creating {args.path}</div>;
+      if (command === "str_replace" || command === "insert") return <div>Editing {args.path}</div>;
+      if (command === "view") return <div>Reading {args.path}</div>;
+    }
+    return <div>{toolName}</div>;
+  },
+}));
+
 afterEach(() => {
   cleanup();
 });
@@ -65,7 +80,7 @@ test("MessageList renders messages with parts", () => {
           type: "tool-invocation",
           toolInvocation: {
             toolCallId: "asdf",
-            args: {},
+            args: { command: "create", path: "/src/Button.tsx" },
             toolName: "str_replace_editor",
             state: "result",
             result: "Success",
@@ -78,7 +93,8 @@ test("MessageList renders messages with parts", () => {
   render(<MessageList messages={messages} />);
 
   expect(screen.getByText("Creating your component...")).toBeDefined();
-  expect(screen.getByText("str_replace_editor")).toBeDefined();
+  // Now expects user-friendly message instead of raw tool name
+  expect(screen.getByText("Creating /src/Button.tsx")).toBeDefined();
 });
 
 test("MessageList shows content for assistant message with content", () => {
